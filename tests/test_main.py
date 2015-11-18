@@ -65,6 +65,9 @@ class AuthPopupForm(AuthForm):
     LOGIN_BUTTON = '//*[@id="PH_authLink"]'
 
     def open_login_popup(self):
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_BUTTON))
+        )
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
         WebDriverWait(self.driver, 5).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
@@ -85,6 +88,8 @@ class UserInfoForm(object):
 
 class TopBarForm(object):
     EMAIL_FORM = '//*[@id="PH_user-email"]'
+    POPUP_PATH = '//*[@id="PH_projectsMenu"]'
+    POPUP_BUTTON = '//*[@id="PH_projectsMenu_button"]'
 
     def __init__(self, driver):
         self.driver = driver
@@ -93,6 +98,15 @@ class TopBarForm(object):
         return WebDriverWait(self.driver, 10).until(
             lambda driver: driver.find_element_by_xpath(self.EMAIL_FORM).text
         )
+
+    def trigger_popup(self):
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.POPUP_BUTTON))
+        )
+        self.driver.find_element_by_xpath(self.POPUP_BUTTON).click()
+
+    def get_popup_classes(self):
+        return self.driver.find_element_by_xpath(self.POPUP_PATH).get_attribute("class").split()
 
 
 class SearchForm(object):
@@ -107,9 +121,15 @@ class SearchForm(object):
         return self.driver.current_url
 
     def set_search_field(self, search_string):
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.SEARCH_INPUT))
+        )
         self.driver.find_element_by_xpath(self.SEARCH_INPUT).send_keys(search_string)
 
     def submit_search(self):
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.SEARCH_SUBMIT))
+        )
         self.driver.find_element_by_xpath(self.SEARCH_SUBMIT).click()
         WebDriverWait(self.driver, 5).until(
             lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.SEARCH_REF))
@@ -189,8 +209,6 @@ class MainPageTest(unittest.TestCase):
         user_email = user_info_form.get_user_email()
         self.assertEquals(user_email, self.user_email)
 
-        # print self.driver.find_element_by_xpath('//*[@id="news"]/div[1]/table/tbody/tr/td[1]')
-
         top_bar_form = main_page.top_bar_form
         user_email = top_bar_form.get_user_email()
         self.assertEquals(user_email, self.user_email)
@@ -215,36 +233,43 @@ class MainPageTest(unittest.TestCase):
         blocks_number = 5
 
         for i in range(1, blocks_number):
-            element = self.driver.find_element_by_xpath(news_block_path + str(i+1) + string_end)
+            element = self.driver.find_element_by_xpath(news_block_path + str(i + 1) + string_end)
             self.assertEquals(element.get_attribute("class").split(), chosen_block_class)
-            self.driver.find_element_by_xpath(news_block_button + str(i+1) + string_end).click()
+            self.driver.find_element_by_xpath(news_block_button + str(i + 1) + string_end).click()
             self.assertEquals(element.get_attribute("class").split(), not_chosen_block_class)
 
-        self.driver.set_window_size(1300, 300)
+        self.driver.set_window_size(1300, 800)
         self.driver.find_element_by_xpath(news_block_button + str(1) + string_end).click()
 
         blocks_number = 8
 
         for i in range(1, blocks_number):
-            element = self.driver.find_element_by_xpath(news_block_path + str(i+1) + string_end)
+            element = self.driver.find_element_by_xpath(news_block_path + str(i + 1) + string_end)
             self.assertEquals(element.get_attribute("class").split(), chosen_block_class)
-            self.driver.find_element_by_xpath(news_block_button + str(i+1) + string_end).click()
+            self.driver.find_element_by_xpath(news_block_button + str(i + 1) + string_end).click()
             self.assertEquals(element.get_attribute("class").split(), not_chosen_block_class)
 
+    def test_top_bar_popup(self):
+        popup_closed_classes = 'x-ph__menu'.split()
+        popup_opened_classes_full_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_left'.split()
+        popup_opened_classes_small_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_right'.split()
+        main_page = Page(self.driver)
+        main_page.open()
 
-    #
-    #     MAIN_NEWS_BLOCK_BUTTON = '//*[@id="news__tabs_firstlane"]'
-    #     REGIONAL_NEWS_BLOCK_BUTTON = '//*[@id="news__tabs_regional"]'
-    #     SPORT_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[3]'
-    #     AUTO_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[4]'
-    #     AFISHA_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[5]'
-    #     LADY_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[6]'
-    #     GAMES_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[7]'
-    #     HI_TECH_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[8]'
-    #
-    #     main_page = Page(self.driver)
-    #     main_page.open()
+        top_bar_form = main_page.top_bar_form
 
+        self.driver.set_window_size(800, 500)
 
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_small_size)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
 
+        self.driver.set_window_size(1300, 800)
 
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
