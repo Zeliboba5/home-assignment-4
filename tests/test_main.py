@@ -40,7 +40,7 @@ class AuthForm(object):
     LOGIN_INPUT = '//*[@id="mailbox__login"]'
     PASSWORD_INPUT = '//*[@id="mailbox__password"]'
     SUBMIT_BUTTON = '//*[@id="mailbox__auth__button"]'
-    MAIL_RU_REF = '//*[@id="portal-headline"]/table/tbody/tr/td[1]/a[1]'
+    MAIL_RU_REF = '//*[@id="portal-menu"]/div[2]/div/div[1]/div[1]/div/div/a/img'
 
     def __init__(self, driver):
         self.driver = driver
@@ -66,6 +66,9 @@ class AuthPopupForm(AuthForm):
 
     def open_login_popup(self):
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
+        )
 
 
 class UserInfoForm(object):
@@ -95,7 +98,7 @@ class TopBarForm(object):
 class SearchForm(object):
     SEARCH_INPUT = '//*[@id="q"]'
     SEARCH_SUBMIT = '//*[@id="search__button__wrapper__field"]'
-    RESULT_SEARCH_INPUT = '//*[@id="q"]'  # Don't know if i should test this
+    SEARCH_REF = '//*[@id="logo"]/img'  # Don't know if i should test this
 
     def __init__(self, driver):
         self.driver = driver
@@ -109,12 +112,12 @@ class SearchForm(object):
     def submit_search(self):
         self.driver.find_element_by_xpath(self.SEARCH_SUBMIT).click()
         WebDriverWait(self.driver, 5).until(
-            lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.RESULT_SEARCH_INPUT))
+            lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.SEARCH_REF))
         )
 
     def get_result_search_string(self):
         return WebDriverWait(self.driver, 10).until(
-            lambda driver: driver.find_element_by_xpath(self.RESULT_SEARCH_INPUT).get_attribute('value').encode('utf-8')
+            lambda driver: driver.find_element_by_xpath(self.SEARCH_INPUT).get_attribute('value').encode('utf-8')
         )
 
 
@@ -170,7 +173,7 @@ class MainPageTest(unittest.TestCase):
         self.assertEquals(result_search_string, self.search_string)
         self.assertEquals(search_url, self.search_url)
 
-    def testLoginByPopup(self):
+    def test_login_by_popup(self):
         main_page = Page(self.driver)
         main_page.open()
 
@@ -186,6 +189,62 @@ class MainPageTest(unittest.TestCase):
         user_email = user_info_form.get_user_email()
         self.assertEquals(user_email, self.user_email)
 
+        # print self.driver.find_element_by_xpath('//*[@id="news"]/div[1]/table/tbody/tr/td[1]')
+
         top_bar_form = main_page.top_bar_form
         user_email = top_bar_form.get_user_email()
         self.assertEquals(user_email, self.user_email)
+
+    def get_parent_element(self, xpath_to_element):
+        element = self.driver.find_element_by_xpath(xpath_to_element)
+        return element.find_element_by_xpath('..')
+
+    def test_news_blocks(self):
+        not_chosen_block_class = 'news__list '.split()
+        chosen_block_class = 'news__list  news__list_active'.split()
+
+        news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td['
+        string_end = ']'
+        news_block_path = '//*[@id="news__wrap"]/div['
+
+        main_page = Page(self.driver)
+        main_page.open()
+
+        self.driver.set_window_size(800, 500)
+
+        blocks_number = 5
+
+        for i in range(1, blocks_number):
+            element = self.driver.find_element_by_xpath(news_block_path + str(i+1) + string_end)
+            self.assertEquals(element.get_attribute("class").split(), chosen_block_class)
+            self.driver.find_element_by_xpath(news_block_button + str(i+1) + string_end).click()
+            self.assertEquals(element.get_attribute("class").split(), not_chosen_block_class)
+
+        self.driver.set_window_size(1300, 300)
+        self.driver.find_element_by_xpath(news_block_button + str(1) + string_end).click()
+
+        blocks_number = 8
+
+        for i in range(1, blocks_number):
+            element = self.driver.find_element_by_xpath(news_block_path + str(i+1) + string_end)
+            self.assertEquals(element.get_attribute("class").split(), chosen_block_class)
+            self.driver.find_element_by_xpath(news_block_button + str(i+1) + string_end).click()
+            self.assertEquals(element.get_attribute("class").split(), not_chosen_block_class)
+
+
+    #
+    #     MAIN_NEWS_BLOCK_BUTTON = '//*[@id="news__tabs_firstlane"]'
+    #     REGIONAL_NEWS_BLOCK_BUTTON = '//*[@id="news__tabs_regional"]'
+    #     SPORT_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[3]'
+    #     AUTO_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[4]'
+    #     AFISHA_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[5]'
+    #     LADY_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[6]'
+    #     GAMES_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[7]'
+    #     HI_TECH_NEWS_BLOCK_BUTTON = '//*[@id="news"]/div[1]/table/tbody/tr/td[8]'
+    #
+    #     main_page = Page(self.driver)
+    #     main_page.open()
+
+
+
+
