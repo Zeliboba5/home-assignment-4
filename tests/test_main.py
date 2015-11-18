@@ -65,9 +65,6 @@ class AuthPopupForm(AuthForm):
     LOGIN_BUTTON = '//*[@id="PH_authLink"]'
 
     def open_login_popup(self):
-        WebDriverWait(self.driver, 5).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_BUTTON))
-        )
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
 
 
@@ -158,7 +155,7 @@ class MainPageTest(unittest.TestCase):
         main_page = Page(self.driver)
         main_page.open()
         WebDriverWait(self.driver, 5).until(
-            lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.SEARCH_INPUT))
+            lambda driver: EC.visibility_of(driver.find_element_by_xpath(self.SEARCH_INPUT))
         )
 
         search_form = main_page.search_form
@@ -178,6 +175,7 @@ class MainPageTest(unittest.TestCase):
         main_page.open()
 
         auth_form = main_page.auth_popup_form
+        auth_form.open_login_popup()
         auth_form.set_login(self.login)
         auth_form.set_password(self.password)
         auth_form.submit()
