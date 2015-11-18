@@ -16,6 +16,18 @@ class Page(object):
     def open(self):
         self.driver.get(self.BASE_URL)
 
+    def set_small_screen_size(self):
+        width = 1000  # 1150 and 1250 are border lines between changes in design
+        height = 700  # doesn't affect functionality
+
+        self.driver.set_window_size(width, height)
+
+    def set_full_screen_size(self):
+        width = 1300  # 1150 and 1250 are border lines between changes in design
+        height = 700  # doesn't affect functionality
+
+        self.driver.set_window_size(width, height)
+
     @property
     def auth_form(self):
         return AuthForm(self.driver)
@@ -36,12 +48,17 @@ class Page(object):
     def auth_popup_form(self):
         return AuthPopupForm(self.driver)
 
+    @property
+    def news_form(self):
+        return NewsForm(self.driver)
+
 
 class AuthForm(object):
     LOGIN_INPUT = '//*[@id="mailbox__login"]'
     PASSWORD_INPUT = '//*[@id="mailbox__password"]'
     SUBMIT_BUTTON = '//*[@id="mailbox__auth__button"]'
     MAIL_RU_REF = '//*[@id="portal-menu"]/div[2]/div/div[1]/div[1]/div/div/a/img'
+    ERROR_MESSAGE_PATH = '//*[@id="LoginExternal"]/div[1]/div[3]'
 
     def __init__(self, driver):
         self.driver = driver
@@ -58,6 +75,9 @@ class AuthForm(object):
             lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.MAIL_RU_REF))
         )
 
+    def get_error_message_classes(self):
+        return self.driver.find_element_by_xpath(self.ERROR_MESSAGE_PATH).get_attribute("class").split()
+
 
 class AuthPopupForm(AuthForm):
     LOGIN_INPUT = '//*[@id="ph_login"]'
@@ -73,6 +93,23 @@ class AuthPopupForm(AuthForm):
         WebDriverWait(self.driver, 5).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
         )
+
+
+class NewsForm(object):
+    def __init__(self, driver):
+        self.driver = driver
+
+    def get_news_block_classes(self, span_index):
+        news_block_path = '//*[@id="news__wrap"]/div[' + str(span_index) + ']'
+        return self.driver.find_element_by_xpath(news_block_path).get_attribute("class").split()
+
+    def click_news_block_button(self, span_index):
+        news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td[' + str(span_index) + ']'
+        self.driver.find_element_by_xpath(news_block_button).click()
+
+    def set_news_block_to_default(self):
+        news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td[1]'
+        self.driver.find_element_by_xpath(news_block_button).click()
 
 
 class UserInfoForm(object):
@@ -113,7 +150,7 @@ class TopBarForm(object):
 class SearchForm(object):
     SEARCH_INPUT = '//*[@id="q"]'
     SEARCH_SUBMIT = '//*[@id="search__button__wrapper__field"]'
-    SEARCH_REF = '//*[@id="logo"]/img'  # Don't know if i should test this
+    SEARCH_REF = '//*[@id="logo"]/img'
 
     def __init__(self, driver):
         self.driver = driver
@@ -136,7 +173,7 @@ class SearchForm(object):
             lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.SEARCH_REF))
         )
 
-    def get_result_search_string(self):
+    def get_result_search_string(self):  # Don't know if i should test this
         return WebDriverWait(self.driver, 10).until(
             lambda driver: driver.find_element_by_xpath(self.SEARCH_INPUT).get_attribute('value').encode('utf-8')
         )
@@ -146,12 +183,16 @@ class MainPageTest(unittest.TestCase):
     SEARCH_INPUT = '//*[@id="q"]'
     login = "tester-mega"
     password = os.environ['MAIL_TEST_PASS']
+    wrong_password = "qwerty123"
     user_email = "tester-mega@mail.ru"
     search_string = "test"
     search_url = "http://go.mail.ru/"
 
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Remote(
+            command_executor='http://127.0.0.1:4444/wd/hub',
+            desired_capabilities=DesiredCapabilities.FIREFOX,
+        )
 
     def tearDown(self):
         self.driver.quit()
@@ -174,6 +215,20 @@ class MainPageTest(unittest.TestCase):
         top_bar_form = main_page.top_bar_form
         user_email = top_bar_form.get_user_email()
         self.assertEquals(user_email, self.user_email)
+
+    def test_user_login_fail(self):
+        error_message_classes = ('login-page__external_error' +
+                                 ' login-page__external__text_indent js-login-page__external__info').split()
+
+        main_page = Page(self.driver)
+        main_page.open()
+
+        auth_form = main_page.auth_form
+        auth_form.set_login(self.login)
+        auth_form.set_password(self.wrong_password)
+        auth_form.submit()
+
+        self.assertEqual(auth_form.get_error_message_classes(), error_message_classes)
 
     def test_search(self):
         main_page = Page(self.driver)
@@ -222,33 +277,28 @@ class MainPageTest(unittest.TestCase):
         not_chosen_block_class = 'news__list '.split()
         chosen_block_class = 'news__list  news__list_active'.split()
 
-        news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td['
-        string_end = ']'
-        news_block_path = '//*[@id="news__wrap"]/div['
-
         main_page = Page(self.driver)
         main_page.open()
+        news_form = main_page.news_form
 
-        self.driver.set_window_size(800, 500)
+        main_page.set_small_screen_size()
 
-        blocks_number = 5
+        blocks_number = 4
 
-        for i in range(1, blocks_number):
-            element = self.driver.find_element_by_xpath(news_block_path + str(i + 1) + string_end)
-            self.assertEquals(element.get_attribute("class").split(), chosen_block_class)
-            self.driver.find_element_by_xpath(news_block_button + str(i + 1) + string_end).click()
-            self.assertEquals(element.get_attribute("class").split(), not_chosen_block_class)
+        for i in range(2, blocks_number):  # starts from 2 because of unique main page layout
+            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
+            news_form.click_news_block_button(i)
+            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
 
-        self.driver.set_window_size(1300, 800)
-        self.driver.find_element_by_xpath(news_block_button + str(1) + string_end).click()
+        main_page.set_full_screen_size()
+        news_form.set_news_block_to_default()
 
-        blocks_number = 8
+        blocks_number = 7
 
-        for i in range(1, blocks_number):
-            element = self.driver.find_element_by_xpath(news_block_path + str(i + 1) + string_end)
-            self.assertEquals(element.get_attribute("class").split(), chosen_block_class)
-            self.driver.find_element_by_xpath(news_block_button + str(i + 1) + string_end).click()
-            self.assertEquals(element.get_attribute("class").split(), not_chosen_block_class)
+        for i in range(2, blocks_number):
+            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
+            news_form.click_news_block_button(i)
+            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
 
     def test_top_bar_popup(self):
         popup_closed_classes = 'x-ph__menu'.split()
@@ -259,7 +309,7 @@ class MainPageTest(unittest.TestCase):
 
         top_bar_form = main_page.top_bar_form
 
-        self.driver.set_window_size(800, 500)
+        main_page.set_small_screen_size()
 
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
         top_bar_form.trigger_popup()
@@ -267,26 +317,10 @@ class MainPageTest(unittest.TestCase):
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
 
-        self.driver.set_window_size(1300, 800)
+        main_page.set_full_screen_size()
 
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
-
-
-class NewTestCase(unittest.TestCase):
-    BASE_URL = "http://mail.ru"
-
-    def setUp(self):
-        self.driver = webdriver.Remote(
-            command_executor='http://127.0.0.1:4444/wd/hub',
-            desired_capabilities=DesiredCapabilities.CHROME,
-        )
-
-    def tearDown(self):
-        self.driver.quit()
-
-    def test_open_chrome(self):
-        self.driver.get(self.BASE_URL)
