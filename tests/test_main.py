@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.ui import WebDriverWait
 import unittest
 from selenium.webdriver.support import expected_conditions as EC
@@ -273,3 +274,19 @@ class MainPageTest(unittest.TestCase):
         self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+
+
+class NewTestCase(unittest.TestCase):
+    BASE_URL = "http://mail.ru"
+
+    def setUp(self):
+        self.driver = webdriver.Remote(
+            command_executor='http://127.0.0.1:4444/wd/hub',
+            desired_capabilities=DesiredCapabilities.CHROME,
+        )
+
+    def tearDown(self):
+        self.driver.quit()
+
+    def test_open_chrome(self):
+        self.driver.get(self.BASE_URL)
