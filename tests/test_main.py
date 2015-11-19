@@ -64,9 +64,15 @@ class AuthForm(object):
         self.driver = driver
 
     def set_login(self, login):
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
+        )
         self.driver.find_element_by_xpath(self.LOGIN_INPUT).send_keys(login)
 
     def set_password(self, password):
+        WebDriverWait(self.driver, 5).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.PASSWORD_INPUT))
+        )
         self.driver.find_element_by_xpath(self.PASSWORD_INPUT).send_keys(password)
 
     def submit(self):
@@ -90,9 +96,6 @@ class AuthPopupForm(AuthForm):
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_BUTTON))
         )
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
-        WebDriverWait(self.driver, 5).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
-        )
 
 
 class NewsForm(object):
@@ -342,7 +345,7 @@ class DebugPageTest(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Remote(
             command_executor='http://127.0.0.1:4444/wd/hub',
-            desired_capabilities=DesiredCapabilities.CHROME,
+            desired_capabilities=DesiredCapabilities.FIREFOX,
         )
 
     def tearDown(self):

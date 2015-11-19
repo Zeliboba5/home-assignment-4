@@ -55,3 +55,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+chromedriver
+selenium-server-standalone-2.48.2.jar
