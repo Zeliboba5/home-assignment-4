@@ -12,13 +12,13 @@ class Page(object):
         self.driver.get(self.BASE_URL)
 
     def set_small_screen_size(self):
-        width = 1000  # 1150 and 1250 are border lines between changes in design
+        width = 1000  # 11100 and 12100 are border lines between changes in design
         height = 700  # doesn't affect functionality
 
         self.driver.set_window_size(width, height)
 
     def set_full_screen_size(self):
-        width = 1300  # 1150 and 1250 are border lines between changes in design
+        width = 1300  # 11100 and 12100 are border lines between changes in design
         height = 700  # doesn't affect functionality
 
         self.driver.set_window_size(width, height)
@@ -65,20 +65,20 @@ class AuthForm(object):
         self.submit()
 
     def set_login(self, login):
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
         )
         self.driver.find_element_by_xpath(self.LOGIN_INPUT).send_keys(login)
 
     def set_password(self, password):
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.PASSWORD_INPUT))
         )
         self.driver.find_element_by_xpath(self.PASSWORD_INPUT).send_keys(password)
 
     def submit(self):
         self.driver.find_element_by_xpath(self.SUBMIT_BUTTON).click()
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.MAIL_RU_REF))
         )
 
@@ -101,7 +101,7 @@ class AuthPopupForm(AuthForm):
     LOGIN_BUTTON = '//*[@id="PH_authLink"]'
 
     def open_login_popup(self):
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_BUTTON))
         )
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
@@ -150,7 +150,7 @@ class TopBarForm(object):
         )
 
     def trigger_popup(self):
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.POPUP_BUTTON))
         )
         self.driver.find_element_by_xpath(self.POPUP_BUTTON).click()
@@ -167,25 +167,30 @@ class SearchForm(object):
     def __init__(self, driver):
         self.driver = driver
 
+    def wait_input_load(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.visibility_of(driver.find_element_by_xpath(self.SEARCH_INPUT))
+        )
+
     def get_current_url(self):
         return self.driver.current_url
 
     def set_search_field(self, search_string):
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.SEARCH_INPUT))
         )
         self.driver.find_element_by_xpath(self.SEARCH_INPUT).send_keys(search_string)
 
     def submit_search(self):
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.SEARCH_SUBMIT))
         )
         self.driver.find_element_by_xpath(self.SEARCH_SUBMIT).click()
-        WebDriverWait(self.driver, 5).until(  # This wait is to ensure that page has changed, because search
+        WebDriverWait(self.driver, 10).until(  # This wait is to ensure that page has changed, because search
             lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.SEARCH_REF))
             # input have same path on all pages
         )
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.SEARCH_INPUT))
         )
 

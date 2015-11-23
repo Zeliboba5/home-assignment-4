@@ -63,18 +63,16 @@ class MainPageTest(unittest.TestCase):
         main_page.open()
 
         auth_form = main_page.auth_form
-        auth_form.login(self.login, self.password)
+        auth_form.login(self.login, self.wrong_password)
 
         self.assertEqual(auth_form.get_error_message_classes(), error_message_classes)
 
     def test_search(self):
         main_page = Page(self.driver)
         main_page.open()
-        WebDriverWait(self.driver, 5).until(
-            lambda driver: EC.visibility_of(driver.find_element_by_xpath(self.SEARCH_INPUT))
-        )
 
         search_form = main_page.search_form
+        search_form.wait_input_load()
         search_form.set_search_field(self.search_string)
         search_form.submit_search()
         result_search_string = search_form.get_result_search_string()

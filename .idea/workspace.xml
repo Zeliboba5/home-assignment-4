@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9fd5e7fc-9514-4004-b891-7aebf02692e5" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/page_object.py" afterPath="$PROJECT_DIR$/tests/page_object.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_main.py" afterPath="$PROJECT_DIR$/tests/test_main.py" />
     </list>
@@ -31,8 +32,8 @@
       <file leaf-file-name="test_main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tests/test_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33612272">
-              <caret line="41" column="50" selection-start-line="41" selection-start-column="50" selection-end-line="41" selection-end-column="50" />
+            <state vertical-scroll-proportion="0.38354254">
+              <caret line="65" column="55" selection-start-line="65" selection-start-column="55" selection-end-line="65" selection-end-column="55" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -63,8 +64,8 @@
       <file leaf-file-name="page_object.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/page_object.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="64" column="21" selection-start-line="64" selection-start-column="21" selection-end-line="64" selection-end-column="21" />
+            <state vertical-scroll-proportion="9.740741">
+              <caret line="52" column="39" selection-start-line="52" selection-start-column="39" selection-end-line="52" selection-end-column="39" />
               <folding>
                 <element signature="e#0#64#0" expanded="true" />
               </folding>
@@ -592,8 +593,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/page_object.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="64" column="21" selection-start-line="64" selection-start-column="21" selection-end-line="64" selection-end-column="21" />
+        <state vertical-scroll-proportion="9.740741">
+          <caret line="52" column="39" selection-start-line="52" selection-start-column="39" selection-end-line="52" selection-end-column="39" />
           <folding>
             <element signature="e#0#64#0" expanded="true" />
           </folding>
@@ -602,8 +603,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33612272">
-          <caret line="41" column="50" selection-start-line="41" selection-start-column="50" selection-end-line="41" selection-end-column="50" />
+        <state vertical-scroll-proportion="0.38354254">
+          <caret line="65" column="55" selection-start-line="65" selection-start-column="55" selection-end-line="65" selection-end-column="55" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
