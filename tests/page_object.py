@@ -74,7 +74,7 @@ class AuthForm(object):
     def submit(self):
         self.driver.find_element_by_xpath(self.SUBMIT_BUTTON).click()
         WebDriverWait(self.driver, 5).until(
-            lambda driver: EC.presence_of_element_located(driver.find_element_by_xpath(self.MAIL_RU_REF))
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.MAIL_RU_REF))
         )
 
     def get_error_message_classes(self):

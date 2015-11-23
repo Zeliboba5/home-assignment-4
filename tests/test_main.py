@@ -11,16 +11,24 @@ import os
 class MainPageTest(unittest.TestCase):
     SEARCH_INPUT = '//*[@id="q"]'
     login = "tester-mega"
-    password = os.environ['MAIL_TEST_PASS']
+    password = os.environ['TTHA4PASSWORD']
     wrong_password = "qwerty123"
     user_email = "tester-mega@mail.ru"
     search_string = "test"
     search_url = "http://go.mail.ru/"
+    browser = os.environ['TTHA4BROWSER']
 
     def setUp(self):
+        if self.browser == 'CHROME':
+            capabilities = DesiredCapabilities.CHROME
+        elif self.browser == 'FIREFOX':
+            capabilities = DesiredCapabilities.FIREFOX
+        else:
+            capabilities = DesiredCapabilities.FIREFOX
+
         self.driver = webdriver.Remote(
             command_executor='http://127.0.0.1:4444/wd/hub',
-            desired_capabilities=DesiredCapabilities.CHROME,
+            desired_capabilities=capabilities,
         )
 
     def tearDown(self):
@@ -157,22 +165,3 @@ class MainPageTest(unittest.TestCase):
         self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
-
-
-class DebugPageTest(unittest.TestCase):
-    SEARCH_INPUT = '//*[@id="q"]'
-    login = "tester-mega"
-    password = os.environ['MAIL_TEST_PASS']
-    wrong_password = "qwerty123"
-    user_email = "tester-mega@mail.ru"
-    search_string = "test"
-    search_url = "http://go.mail.ru/"
-
-    def setUp(self):
-        self.driver = webdriver.Remote(
-            command_executor='http://127.0.0.1:4444/wd/hub',
-            desired_capabilities=DesiredCapabilities.FIREFOX,
-        )
-
-    def tearDown(self):
-        self.driver.quit()
