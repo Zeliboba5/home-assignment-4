@@ -59,6 +59,11 @@ class AuthForm(object):
     def __init__(self, driver):
         self.driver = driver
 
+    def login(self, login, password):
+        self.set_login(login)
+        self.set_password(password)
+        self.submit()
+
     def set_login(self, login):
         WebDriverWait(self.driver, 5).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))

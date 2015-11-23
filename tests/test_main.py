@@ -39,9 +39,7 @@ class MainPageTest(unittest.TestCase):
         main_page.open()
 
         auth_form = main_page.auth_form
-        auth_form.set_login(self.login)
-        auth_form.set_password(self.password)
-        auth_form.submit()
+        auth_form.login(self.login, self.password)
 
         main_page.open()
 
@@ -65,9 +63,7 @@ class MainPageTest(unittest.TestCase):
         main_page.open()
 
         auth_form = main_page.auth_form
-        auth_form.set_login(self.login)
-        auth_form.set_password(self.wrong_password)
-        auth_form.submit()
+        auth_form.login(self.login, self.password)
 
         self.assertEqual(auth_form.get_error_message_classes(), error_message_classes)
 
@@ -96,9 +92,7 @@ class MainPageTest(unittest.TestCase):
 
         auth_form = main_page.auth_popup_form
         auth_form.open_login_popup()
-        auth_form.set_login(self.login)
-        auth_form.set_password(self.password)
-        auth_form.submit()
+        auth_form.login(self.login, self.password)
 
         main_page.open()
 
