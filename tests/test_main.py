@@ -200,7 +200,7 @@ class MainPageTest(unittest.TestCase):
         self.assertTrue(account_menu.is_both_emails_present())
 
     def test_right_ad_block_presence(self):
-        ad_xpath = '//*[@id="swiffycontainer"]/div/canvas'
+        ad_xpath = '//*[@id="slot_4499"]'
 
         main_page = Page(self.driver)
         main_page.open()
@@ -217,6 +217,7 @@ class MainPageTest(unittest.TestCase):
         main_page = Page(self.driver)
         main_page.open()
 
+        main_page.set_full_screen_size()  # Description only visible on full size
         news_form = main_page.news_form
         self.assertTrue(news_form.is_news_description_visible())
 
@@ -224,6 +225,6 @@ class MainPageTest(unittest.TestCase):
         main_page = Page(self.driver)
         main_page.open()
 
+        main_page.set_full_screen_size()
         news_form = main_page.news_form
         self.assertTrue(news_form.is_description_related_to_news())
-

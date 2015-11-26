@@ -114,18 +114,22 @@ class AuthPopupForm(AuthForm):
     PASSWORD_INPUT = '//*[@id="ph_password"]'
     SUBMIT_BUTTON = '//*[@id="x-ph__authForm__popup"]/div[3]/div/div[1]/span/span/input'
     LOGIN_BUTTON = '//*[@id="PH_authLink"]'
+    LOGIN_POPUP = '//*[@id="x-ph__authForm__popup"]'
 
     def open_login_popup(self):
         WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_BUTTON))
         )
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_POPUP))
+        )
 
 
 class NewsForm(object):
     # Эти селекторы подходят, так как нас интересуют только первые элементы
-    news_description = '//div[@class="news__list__item__description"]'
-    news_title = 'news__list__item__link'
+    news_description = '//a[@class="news__list__item__description"]'
+    news_title = '//a[@class="news__list__item__link"]'
 
     def __init__(self, driver):
         self.driver = driver
@@ -204,7 +208,7 @@ class TopBarForm(object):
 class SearchForm(object):
     SEARCH_INPUT = '//*[@id="q"]'
     SEARCH_SUBMIT = '//*[@id="search__button__wrapper__field"]'
-    SEARCH_REF = '//*[@id="logo"]/img'
+    SEARCH_REF = '//*[@class="pm-logo__link"]'
 
     def __init__(self, driver):
         self.driver = driver
@@ -247,9 +251,10 @@ class AccountMenu(object):
     account_menu_username = '//div[@class="x-ph__auth_list__item__info__email__text"]'
     account_menu_email = '//div[@class="x-ph__auth_list__item__info__text"]'
     account_menu_button = '//*[@id="PH_authMenu_button"]'
-    account_menu_add_email = '//*[@id="PH_loginAnotherLink"]/span/span'
+    account_menu_add_email = '//*[@id="PH_loginAnotherLink"]'
     account_menu_first_email_block = '//*[@id="PH_authMenu_links"]'
     account_menu_second_email_block = '//*[@id="PH_authMenu_list_wrap"]'
+    LOGIN_POPUP = '//*[@id="x-ph__authForm__popup"]'
 
     def __init__(self, driver):
         self.driver = driver
@@ -281,11 +286,21 @@ class AccountMenu(object):
         )
 
     def add_second_email(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.account_menu_add_email))
+        )
         self.driver.find_element_by_xpath(self.account_menu_add_email).click()
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_POPUP))
+        )
 
     def is_both_emails_present(self):
-        is_first_block_present = self.driver.find_element_by_xpath(self.account_menu_first_email_block).is_displayed()
-        is_second_block_present = self.driver.find_element_by_xpath(self.account_menu_second_email_block).is_displayed()
+        is_first_block_present = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.account_menu_first_email_block).is_displayed()
+        )
+        is_second_block_present = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.account_menu_second_email_block).is_displayed()
+        )
         if is_first_block_present and is_second_block_present:
             return True
         else:
