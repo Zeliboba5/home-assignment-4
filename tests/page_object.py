@@ -1,3 +1,4 @@
+# coding=utf-8
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -22,6 +23,16 @@ class Page(object):
         height = 700  # doesn't affect functionality
 
         self.driver.set_window_size(width, height)
+
+    def is_element_present(self, path):
+        element = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(path)
+        )
+
+        if element.is_displayed():
+            return True
+        else:
+            return False
 
     @property
     def auth_form(self):
@@ -112,6 +123,10 @@ class AuthPopupForm(AuthForm):
 
 
 class NewsForm(object):
+    # Эти селекторы подходят, так как нас интересуют только первые элементы
+    news_description = '//div[@class="news__list__item__description"]'
+    news_title = 'news__list__item__link'
+
     def __init__(self, driver):
         self.driver = driver
 
@@ -126,6 +141,29 @@ class NewsForm(object):
     def set_news_block_to_default(self):
         news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td[1]'
         self.driver.find_element_by_xpath(news_block_button).click()
+
+    def is_news_description_visible(self):
+        element = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.news_description)
+        )
+
+        if element.is_displayed():
+            return True
+        else:
+            return False
+
+    def is_description_related_to_news(self):
+        title_number = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.news_title).get_attribute("name")
+        )
+        description_number = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.news_description).get_attribute("name")
+        )
+
+        if description_number == title_number:
+            return True
+        else:
+            return False
 
 
 class UserInfoForm(object):

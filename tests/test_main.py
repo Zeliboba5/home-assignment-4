@@ -199,4 +199,31 @@ class MainPageTest(unittest.TestCase):
         account_menu.open_account_menu()
         self.assertTrue(account_menu.is_both_emails_present())
 
+    def test_right_ad_block_presence(self):
+        ad_xpath = '//*[@id="swiffycontainer"]/div/canvas'
+
+        main_page = Page(self.driver)
+        main_page.open()
+        self.assertTrue(main_page.is_element_present(ad_xpath))
+
+    def test_center_ad_block_presence(self):
+        ad_xpath = '//*[@id="slot_4847"]/a'
+
+        main_page = Page(self.driver)
+        main_page.open()
+        self.assertTrue(main_page.is_element_present(ad_xpath))
+
+    def test_description_presence(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        news_form = main_page.news_form
+        self.assertTrue(news_form.is_news_description_visible())
+
+    def test_title_and_description_relation(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        news_form = main_page.news_form
+        self.assertTrue(news_form.is_description_related_to_news())
 
