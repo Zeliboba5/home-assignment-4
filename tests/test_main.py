@@ -11,6 +11,8 @@ import os
 class MainPageTest(unittest.TestCase):
     SEARCH_INPUT = '//*[@id="q"]'
     login = "tester-mega"
+    second_login = "tester-mega2"
+    username = "Mega Tester"
     password = os.environ['TTHA4PASSWORD']
     wrong_password = "qwerty123"
     user_email = "tester-mega@mail.ru"
@@ -157,3 +159,44 @@ class MainPageTest(unittest.TestCase):
         self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+
+    def test_account_menu_open(self):
+        main_page = Page(self.driver)
+        main_page.open()
+        auth_form = main_page.auth_form
+
+        auth_form.login(self.login, self.password)
+        account_menu = main_page.account_menu
+
+        account_menu.open_account_menu()
+
+    def test_account_menu_info(self):
+        main_page = Page(self.driver)
+        main_page.open()
+        auth_form = main_page.auth_form
+
+        auth_form.login(self.login, self.password)
+        account_menu = main_page.account_menu
+
+        account_menu.open_account_menu()
+        self.assertEqual(self.username, account_menu.get_username_from_account_menu())
+        self.assertEqual(self.user_email, account_menu.get_email_from_account_menu())
+
+    def test_account_menu_second_email(self):
+        main_page = Page(self.driver)
+        main_page.open()
+        auth_form = main_page.auth_popup_form
+        auth_form.open_login_popup()
+
+        auth_form.login(self.login, self.password)
+        account_menu = main_page.account_menu
+
+        account_menu.open_account_menu()
+
+        account_menu.add_second_email()
+        auth_form.login(self.second_login, self.password)
+
+        account_menu.open_account_menu()
+        self.assertTrue(account_menu.is_both_emails_present())
+
+

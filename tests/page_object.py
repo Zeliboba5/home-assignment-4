@@ -47,6 +47,10 @@ class Page(object):
     def news_form(self):
         return NewsForm(self.driver)
 
+    @property
+    def account_menu(self):
+        return AccountMenu(self.driver)
+
 
 class AuthForm(object):
     LOGIN_INPUT = '//*[@id="mailbox__login"]'
@@ -198,3 +202,53 @@ class SearchForm(object):
         return WebDriverWait(self.driver, 10).until(
             lambda driver: driver.find_element_by_xpath(self.SEARCH_INPUT).get_attribute('value').encode('utf-8')
         )
+
+
+class AccountMenu(object):
+    account_menu = '//*[@id="PH_authMenu"]'
+    account_menu_username = '//div[@class="x-ph__auth_list__item__info__email__text"]'
+    account_menu_email = '//div[@class="x-ph__auth_list__item__info__text"]'
+    account_menu_button = '//*[@id="PH_authMenu_button"]'
+    account_menu_add_email = '//*[@id="PH_loginAnotherLink"]/span/span'
+    account_menu_first_email_block = '//*[@id="PH_authMenu_links"]'
+    account_menu_second_email_block = '//*[@id="PH_authMenu_list_wrap"]'
+
+    def __init__(self, driver):
+        self.driver = driver
+
+    def is_popup_opened(self):
+        element = self.driver.find_element_by_xpath(self.account_menu)
+        if element.is_displayed():
+            return True
+        else:
+            return False
+
+    def open_account_menu(self):
+        self.driver.find_element_by_xpath(self.account_menu_button).click()
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.account_menu))
+        )
+
+    def get_account_menu_classes(self):
+        self.driver.find_element_by_xpath(self.account_menu).get_atrribute("class").split()
+
+    def get_username_from_account_menu(self):
+        return WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.account_menu_username).text
+        )
+
+    def get_email_from_account_menu(self):
+        return WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.account_menu_email).text
+        )
+
+    def add_second_email(self):
+        self.driver.find_element_by_xpath(self.account_menu_add_email).click()
+
+    def is_both_emails_present(self):
+        is_first_block_present = self.driver.find_element_by_xpath(self.account_menu_first_email_block).is_displayed()
+        is_second_block_present = self.driver.find_element_by_xpath(self.account_menu_second_email_block).is_displayed()
+        if is_first_block_present and is_second_block_present:
+            return True
+        else:
+            return False
