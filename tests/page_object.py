@@ -101,13 +101,13 @@ class AuthForm(Form):
 
     def set_login(self, login):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable((By.XPATH, self.LOGIN_INPUT))
+            lambda driver: EC.visibility_of((By.XPATH, self.LOGIN_INPUT))
         )
         self.driver.find_element_by_xpath(self.LOGIN_INPUT).send_keys(login)
 
     def set_password(self, password):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable((By.XPATH, self.PASSWORD_INPUT))
+            lambda driver: EC.visibility_of((By.XPATH, self.PASSWORD_INPUT))
         )
         self.driver.find_element_by_xpath(self.PASSWORD_INPUT).send_keys(password)
 
