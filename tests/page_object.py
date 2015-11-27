@@ -1,6 +1,7 @@
 # coding=utf-8
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 
 
 class Page(object):
@@ -62,17 +63,36 @@ class Page(object):
     def account_menu(self):
         return AccountMenu(self.driver)
 
+    @property
+    def mailbox_form(self):
+        return MailboxForm(self.driver)
 
-class AuthForm(object):
+
+class Form(object):
+    def __init__(self, driver):
+        self.driver = driver
+
+    def is_element_present(self, path):
+        element = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(path)
+        )
+
+        if element.is_displayed():
+            return True
+        else:
+            return False
+
+    def get_current_url(self):
+        return self.driver.current_url
+
+
+class AuthForm(Form):
     LOGIN_INPUT = '//*[@id="mailbox__login"]'
     PASSWORD_INPUT = '//*[@id="mailbox__password"]'
     SUBMIT_BUTTON = '//*[@id="mailbox__auth__button"]'
     MAIL_RU_REF = '//*[@id="portal-menu"]/div[2]/div/div[1]/div[1]/div/div/a/img'
     ERROR_MESSAGE_PATH = '//*[@id="LoginExternal"]/div[1]/div[3]'
     LOGOUT_BUTTON = '//*[@id="PH_logoutLink"]'
-
-    def __init__(self, driver):
-        self.driver = driver
 
     def login(self, login, password):
         self.set_login(login)
@@ -81,13 +101,13 @@ class AuthForm(object):
 
     def set_login(self, login):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_INPUT))
+            lambda driver: EC.element_to_be_clickable((By.XPATH, self.LOGIN_INPUT))
         )
         self.driver.find_element_by_xpath(self.LOGIN_INPUT).send_keys(login)
 
     def set_password(self, password):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.PASSWORD_INPUT))
+            lambda driver: EC.element_to_be_clickable((By.XPATH, self.PASSWORD_INPUT))
         )
         self.driver.find_element_by_xpath(self.PASSWORD_INPUT).send_keys(password)
 
@@ -115,6 +135,8 @@ class AuthPopupForm(AuthForm):
     SUBMIT_BUTTON = '//*[@id="x-ph__authForm__popup"]/div[3]/div/div[1]/span/span/input'
     LOGIN_BUTTON = '//*[@id="PH_authLink"]'
     LOGIN_POPUP = '//*[@id="x-ph__authForm__popup"]'
+    LOGIN_FORM = '//*[@id="x-ph__authForm"]/div'
+    PRELOADER = '//*[@class="x-ph__popup__content__preloader"]'
 
     def open_login_popup(self):
         WebDriverWait(self.driver, 10).until(
@@ -122,17 +144,17 @@ class AuthPopupForm(AuthForm):
         )
         self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_POPUP))
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_FORM))
+        )
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.invisibility_of_element_located(driver.find_element_by_xpath(self.PRELOADER))
         )
 
 
-class NewsForm(object):
+class NewsForm(Form):
     # Эти селекторы подходят, так как нас интересуют только первые элементы
     news_description = '//a[@class="news__list__item__description"]'
     news_title = '//a[@class="news__list__item__link"]'
-
-    def __init__(self, driver):
-        self.driver = driver
 
     def get_news_block_classes(self, span_index):
         news_block_path = '//*[@id="news__wrap"]/div[' + str(span_index) + ']'
@@ -170,11 +192,8 @@ class NewsForm(object):
             return False
 
 
-class UserInfoForm(object):
+class UserInfoForm(Form):
     EMAIL_FORM = '//*[@id="js-mailbox-user"]'
-
-    def __init__(self, driver):
-        self.driver = driver
 
     def get_user_email(self):
         return WebDriverWait(self.driver, 10).until(
@@ -182,13 +201,13 @@ class UserInfoForm(object):
         )
 
 
-class TopBarForm(object):
+class TopBarForm(Form):
     EMAIL_FORM = '//*[@id="PH_user-email"]'
     POPUP_PATH = '//*[@id="PH_projectsMenu"]'
     POPUP_BUTTON = '//*[@id="PH_projectsMenu_button"]'
-
-    def __init__(self, driver):
-        self.driver = driver
+    TOP_BAR = '//*[@id="portal-headline"]'
+    EMAIL_REF = '//*[@id="ph_mail"]'
+    EMAIL_MENU = '//*[@id="portal-menu"]'
 
     def get_user_email(self):
         return WebDriverWait(self.driver, 10).until(
@@ -204,22 +223,25 @@ class TopBarForm(object):
     def get_popup_classes(self):
         return self.driver.find_element_by_xpath(self.POPUP_PATH).get_attribute("class").split()
 
+    def go_to_mail_by_top_bar_ref(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.EMAIL_REF))
+        )
+        self.driver.find_element_by_xpath(self.EMAIL_REF).click()
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.EMAIL_MENU))
+        )
 
-class SearchForm(object):
+
+class SearchForm(Form):
     SEARCH_INPUT = '//*[@id="q"]'
     SEARCH_SUBMIT = '//*[@id="search__button__wrapper__field"]'
     SEARCH_REF = '//*[@class="pm-logo__link"]'
-
-    def __init__(self, driver):
-        self.driver = driver
 
     def wait_input_load(self):
         WebDriverWait(self.driver, 10).until(
             lambda driver: EC.visibility_of(driver.find_element_by_xpath(self.SEARCH_INPUT))
         )
-
-    def get_current_url(self):
-        return self.driver.current_url
 
     def set_search_field(self, search_string):
         WebDriverWait(self.driver, 10).until(
@@ -246,7 +268,7 @@ class SearchForm(object):
         )
 
 
-class AccountMenu(object):
+class AccountMenu(Form):
     account_menu = '//*[@id="PH_authMenu"]'
     account_menu_username = '//div[@class="x-ph__auth_list__item__info__email__text"]'
     account_menu_email = '//div[@class="x-ph__auth_list__item__info__text"]'
@@ -255,9 +277,6 @@ class AccountMenu(object):
     account_menu_first_email_block = '//*[@id="PH_authMenu_links"]'
     account_menu_second_email_block = '//*[@id="PH_authMenu_list_wrap"]'
     LOGIN_POPUP = '//*[@id="x-ph__authForm__popup"]'
-
-    def __init__(self, driver):
-        self.driver = driver
 
     def is_popup_opened(self):
         element = self.driver.find_element_by_xpath(self.account_menu)
@@ -302,6 +321,53 @@ class AccountMenu(object):
             lambda driver: driver.find_element_by_xpath(self.account_menu_second_email_block).is_displayed()
         )
         if is_first_block_present and is_second_block_present:
+            return True
+        else:
+            return False
+
+
+class MailboxForm(Form):
+    EMAIL_REF = '//*[@id="js-mailbox-user"]'
+    EMAIL_DROPDOWN = '//*[@id="multiAuthMenuDropdown"]/div'
+    ADD_EMAIL_FORM = '//div[@class="multiauth__menu__dropdown__login"]'
+    ADD_EMAIL_BUTTON = '//a[@class="multiauth__menu__dropdown__login__link js-login"]'
+    PRELOADER = '//*[@class="x-ph__popup__content__preloader"]'
+    MAILBOX_PRELOADER = '//*[@class="multiauth__menu__dropdown__loader"]'
+    LOGIN_FORM = '//*[@id="x-ph__authForm"]/div'
+
+    def get_user_email(self):
+        return WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.EMAIL_REF).text
+        )
+
+    def open_email_dropdown(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.EMAIL_REF))
+        )
+        self.driver.find_element_by_xpath(self.EMAIL_REF).click()
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.EMAIL_DROPDOWN))
+        )
+
+    def add_new_email(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.invisibility_of_element_located(driver.find_element_by_xpath(self.MAILBOX_PRELOADER))
+        )
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.visibility_of((By.XPATH, self.ADD_EMAIL_BUTTON))
+        )
+        self.driver.find_element_by_xpath(self.ADD_EMAIL_BUTTON).click()
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.invisibility_of_element_located(driver.find_element_by_xpath(self.PRELOADER))
+        )
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_FORM))
+        )
+
+    def is_both_emails_present(self):
+        first_email_block = '//*[@id="multiAuthMenuList"]/div[1]'
+        second_email_block = '//*[@id="multiAuthMenuList"]/div[2]'
+        if self.is_element_present(first_email_block) and self.is_element_present(second_email_block):
             return True
         else:
             return False

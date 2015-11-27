@@ -228,3 +228,102 @@ class MainPageTest(unittest.TestCase):
         main_page.set_full_screen_size()
         news_form = main_page.news_form
         self.assertTrue(news_form.is_description_related_to_news())
+
+    def test_top_bar_presence(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        top_bar_form = main_page.top_bar_form
+
+        self.assertTrue(top_bar_form.is_element_present(top_bar_form.TOP_BAR))
+
+    def test_top_bar_email_ref(self):
+        mail_url = 'https://e.mail.ru/'
+        main_page = Page(self.driver)
+        main_page.open()
+
+        top_bar_form = main_page.top_bar_form
+
+        top_bar_form.go_to_mail_by_top_bar_ref()
+        full_mail_url = top_bar_form.get_current_url()
+        full_mail_url = urlparse(full_mail_url)
+        result_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_mail_url)
+
+        self.assertEquals(result_url, mail_url)
+
+    def test_mailbox_info(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        auth_form = main_page.auth_popup_form
+        auth_form.open_login_popup()
+        auth_form.login(self.login, self.password)
+        main_page.open()
+
+        mailbox_form = main_page.mailbox_form
+        self.assertEqual(mailbox_form.get_user_email(), self.user_email)
+
+    def test_mailbox_add_second_email(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        auth_form = main_page.auth_popup_form
+        auth_form.open_login_popup()
+        auth_form.login(self.login, self.password)
+        main_page.open()
+
+        mailbox_form = main_page.mailbox_form
+        mailbox_form.open_email_dropdown()
+        mailbox_form.add_new_email()
+        auth_form.login(self.second_login, self.password)
+        main_page.open()
+        mailbox_form.open_email_dropdown()
+        self.assertTrue(mailbox_form.is_both_emails_present())
+
+
+class DebugPageTest(unittest.TestCase):
+    SEARCH_INPUT = '//*[@id="q"]'
+    login = "tester-mega"
+    second_login = "tester-mega2"
+    username = "Mega Tester"
+    password = os.environ['TTHA4PASSWORD']
+    wrong_password = "qwerty123"
+    user_email = "tester-mega@mail.ru"
+    search_string = "test"
+    search_url = "http://go.mail.ru/"
+    browser = os.environ['TTHA4BROWSER']
+
+    def setUp(self):
+        if self.browser == 'CHROME':
+            capabilities = DesiredCapabilities.CHROME
+        elif self.browser == 'FIREFOX':
+            capabilities = DesiredCapabilities.FIREFOX
+        else:
+            capabilities = DesiredCapabilities.FIREFOX
+
+        self.driver = webdriver.Remote(
+            command_executor='http://127.0.0.1:4444/wd/hub',
+            desired_capabilities=capabilities,
+        )
+
+    def tearDown(self):
+        self.driver.quit()
+
+    def test_mailbox_add_second_email(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        auth_form = main_page.auth_popup_form
+        auth_form.open_login_popup()
+        auth_form.login(self.login, self.password)
+        main_page.open()
+
+        mailbox_form = main_page.mailbox_form
+        mailbox_form.open_email_dropdown()
+        mailbox_form.add_new_email()
+        auth_form.login(self.second_login, self.password)
+        main_page.open()
+        mailbox_form.open_email_dropdown()
+        self.assertTrue(mailbox_form.is_both_emails_present())
+
+
