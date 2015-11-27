@@ -9,13 +9,6 @@ import os
 
 
 class MainPageTest(unittest.TestCase):
-    SEARCH_INPUT = '//*[@id="q"]'
-    login = "tester-mega"
-    second_login = "tester-mega2"
-    username = "Mega Tester"
-    password = os.environ['TTHA4PASSWORD']
-    wrong_password = "qwerty123"
-    user_email = "tester-mega@mail.ru"
     search_string = "test"
     search_url = "http://go.mail.ru/"
     browser = os.environ['TTHA4BROWSER']
@@ -35,6 +28,46 @@ class MainPageTest(unittest.TestCase):
 
     def tearDown(self):
         self.driver.quit()
+
+    def test_search(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        search_form = main_page.search_form
+        search_form.wait_input_load()
+        search_form.set_search_field(self.search_string)
+        search_form.submit_search()
+        result_search_string = search_form.get_result_search_string()
+
+        full_search_url = search_form.get_current_url()
+        full_search_url = urlparse(full_search_url)
+        search_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_search_url)
+
+        self.assertEquals(result_search_string, self.search_string)
+        self.assertEquals(search_url, self.search_url)
+
+    def test_right_ad_block_presence(self):
+        ad_xpath = '//*[@id="slot_4499"]'
+
+        main_page = Page(self.driver)
+        main_page.open()
+        self.assertTrue(main_page.is_element_present(ad_xpath))
+
+    def test_center_ad_block_presence(self):
+        ad_xpath = '//*[@id="slot_4847"]/a'
+
+        main_page = Page(self.driver)
+        main_page.open()
+        self.assertTrue(main_page.is_element_present(ad_xpath))
+
+
+class PersonalInfoTestCase(MainPageTest):
+    login = "tester-mega"
+    second_login = "tester-mega2"
+    username = "Mega Tester"
+    password = os.environ['TTHA4PASSWORD']
+    wrong_password = "qwerty123"
+    user_email = "tester-mega@mail.ru"
 
     def test_user_login_and_logout(self):
         main_page = Page(self.driver)
@@ -69,23 +102,6 @@ class MainPageTest(unittest.TestCase):
 
         self.assertEqual(auth_form.get_error_message_classes(), error_message_classes)
 
-    def test_search(self):
-        main_page = Page(self.driver)
-        main_page.open()
-
-        search_form = main_page.search_form
-        search_form.wait_input_load()
-        search_form.set_search_field(self.search_string)
-        search_form.submit_search()
-        result_search_string = search_form.get_result_search_string()
-
-        full_search_url = search_form.get_current_url()
-        full_search_url = urlparse(full_search_url)
-        search_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_search_url)
-
-        self.assertEquals(result_search_string, self.search_string)
-        self.assertEquals(search_url, self.search_url)
-
     def test_login_by_popup(self):
         main_page = Page(self.driver)
         main_page.open()
@@ -103,62 +119,6 @@ class MainPageTest(unittest.TestCase):
         top_bar_form = main_page.top_bar_form
         user_email = top_bar_form.get_user_email()
         self.assertEquals(user_email, self.user_email)
-
-    def get_parent_element(self, xpath_to_element):
-        element = self.driver.find_element_by_xpath(xpath_to_element)
-        return element.find_element_by_xpath('..')
-
-    def test_news_blocks(self):
-        not_chosen_block_class = 'news__list '.split()
-        chosen_block_class = 'news__list  news__list_active'.split()
-
-        main_page = Page(self.driver)
-        main_page.open()
-        news_form = main_page.news_form
-
-        main_page.set_small_screen_size()
-
-        blocks_number = 4
-
-        for i in range(2, blocks_number + 1):  # starts from 2 because of unique main page layout
-            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
-            news_form.click_news_block_button(i)
-            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
-
-        main_page.set_full_screen_size()
-        news_form.set_news_block_to_default()
-
-        blocks_number = 7
-
-        for i in range(2, blocks_number + 1):
-            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
-            news_form.click_news_block_button(i)
-            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
-
-    def test_top_bar_popup(self):
-        popup_closed_classes = 'x-ph__menu'.split()
-        popup_opened_classes_full_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_left'.split()
-        popup_opened_classes_small_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_right'.split()
-        main_page = Page(self.driver)
-        main_page.open()
-
-        top_bar_form = main_page.top_bar_form
-
-        main_page.set_small_screen_size()
-
-        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
-        top_bar_form.trigger_popup()
-        self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_small_size)
-        top_bar_form.trigger_popup()
-        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
-
-        main_page.set_full_screen_size()
-
-        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
-        top_bar_form.trigger_popup()
-        self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
-        top_bar_form.trigger_popup()
-        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
 
     def test_account_menu_open(self):
         main_page = Page(self.driver)
@@ -199,58 +159,6 @@ class MainPageTest(unittest.TestCase):
         account_menu.open_account_menu()
         self.assertTrue(account_menu.is_both_emails_present())
 
-    def test_right_ad_block_presence(self):
-        ad_xpath = '//*[@id="slot_4499"]'
-
-        main_page = Page(self.driver)
-        main_page.open()
-        self.assertTrue(main_page.is_element_present(ad_xpath))
-
-    def test_center_ad_block_presence(self):
-        ad_xpath = '//*[@id="slot_4847"]/a'
-
-        main_page = Page(self.driver)
-        main_page.open()
-        self.assertTrue(main_page.is_element_present(ad_xpath))
-
-    def test_description_presence(self):
-        main_page = Page(self.driver)
-        main_page.open()
-
-        main_page.set_full_screen_size()  # Description only visible on full size
-        news_form = main_page.news_form
-        self.assertTrue(news_form.is_news_description_visible())
-
-    def test_title_and_description_relation(self):
-        main_page = Page(self.driver)
-        main_page.open()
-
-        main_page.set_full_screen_size()
-        news_form = main_page.news_form
-        self.assertTrue(news_form.is_description_related_to_news())
-
-    def test_top_bar_presence(self):
-        main_page = Page(self.driver)
-        main_page.open()
-
-        top_bar_form = main_page.top_bar_form
-
-        self.assertTrue(top_bar_form.is_element_present(top_bar_form.TOP_BAR))
-
-    def test_top_bar_email_ref(self):
-        mail_url = 'https://e.mail.ru/'
-        main_page = Page(self.driver)
-        main_page.open()
-
-        top_bar_form = main_page.top_bar_form
-
-        top_bar_form.go_to_mail_by_top_bar_ref()
-        full_mail_url = top_bar_form.get_current_url()
-        full_mail_url = urlparse(full_mail_url)
-        result_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_mail_url)
-
-        self.assertEquals(result_url, mail_url)
-
     def test_mailbox_info(self):
         main_page = Page(self.driver)
         main_page.open()
@@ -281,3 +189,95 @@ class MainPageTest(unittest.TestCase):
         self.assertTrue(mailbox_form.is_both_emails_present())
 
 
+class TopBarTest(MainPageTest):
+    def test_top_bar_dropdown(self):
+        popup_closed_classes = 'x-ph__menu'.split()
+        popup_opened_classes_full_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_left'.split()
+        popup_opened_classes_small_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_right'.split()
+        main_page = Page(self.driver)
+        main_page.open()
+
+        top_bar_form = main_page.top_bar_form
+
+        main_page.set_small_screen_size()
+
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_small_size)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+
+        main_page.set_full_screen_size()
+
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_full_size)
+        top_bar_form.trigger_popup()
+        self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+
+    def test_top_bar_presence(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        top_bar_form = main_page.top_bar_form
+
+        self.assertTrue(top_bar_form.is_element_present(top_bar_form.TOP_BAR))
+
+    def test_top_bar_email_ref(self):
+        mail_url = 'https://e.mail.ru/'
+        main_page = Page(self.driver)
+        main_page.open()
+
+        top_bar_form = main_page.top_bar_form
+
+        top_bar_form.go_to_mail_by_top_bar_ref()
+        full_mail_url = top_bar_form.get_current_url()
+        full_mail_url = urlparse(full_mail_url)
+        result_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_mail_url)
+
+        self.assertEquals(result_url, mail_url)
+
+
+class NewsBlockTest(MainPageTest):
+    def test_description_presence(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        main_page.set_full_screen_size()  # Description only visible on full size
+        news_form = main_page.news_form
+        self.assertTrue(news_form.is_news_description_visible())
+
+    def test_title_and_description_relation(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        main_page.set_full_screen_size()
+        news_form = main_page.news_form
+        self.assertTrue(news_form.is_description_related_to_news())
+
+    def test_news_blocks(self):
+        not_chosen_block_class = 'news__list '.split()
+        chosen_block_class = 'news__list  news__list_active'.split()
+
+        main_page = Page(self.driver)
+        main_page.open()
+        news_form = main_page.news_form
+
+        main_page.set_small_screen_size()
+
+        blocks_number = 4
+
+        for i in range(2, blocks_number + 1):  # starts from 2 because of unique main page layout
+            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
+            news_form.click_news_block_button(i)
+            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
+
+        main_page.set_full_screen_size()
+        news_form.set_news_block_to_default()
+
+        blocks_number = 7
+
+        for i in range(2, blocks_number + 1):
+            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
+            news_form.click_news_block_button(i)
+            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)

@@ -155,17 +155,24 @@ class NewsForm(Form):
     # Эти селекторы подходят, так как нас интересуют только первые элементы
     news_description = '//a[@class="news__list__item__description"]'
     news_title = '//a[@class="news__list__item__link"]'
+    NEWS_BLOCKS = ['//*[@data-n="main"]',
+                   '//*[@data-n="sport"]',
+                   '//*[@data-n="auto"]',
+                   '//*[@data-n="afisha"]',
+                   '//*[@data-n="lady"]',
+                   '//*[@data-n="games"]',
+                   '//*[@data-n="hitech"]']
 
     def get_news_block_classes(self, span_index):
         news_block_path = '//*[@id="news__wrap"]/div[' + str(span_index) + ']'
         return self.driver.find_element_by_xpath(news_block_path).get_attribute("class").split()
 
     def click_news_block_button(self, span_index):
-        news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td[' + str(span_index) + ']'
+        news_block_button = self.NEWS_BLOCKS[span_index-1]
         self.driver.find_element_by_xpath(news_block_button).click()
 
     def set_news_block_to_default(self):
-        news_block_button = '//*[@id="news"]/div[1]/table/tbody/tr/td[1]'
+        news_block_button = self.NEWS_BLOCKS[0]
         self.driver.find_element_by_xpath(news_block_button).click()
 
     def is_news_description_visible(self):
