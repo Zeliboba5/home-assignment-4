@@ -1,8 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.support.ui import WebDriverWait
 import unittest
-from selenium.webdriver.support import expected_conditions as EC
 from urlparse import urlparse
 from page_object import Page
 import os
