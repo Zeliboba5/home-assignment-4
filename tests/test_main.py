@@ -27,106 +27,6 @@ class MainPageTest(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def test_search(self):
-        main_page = Page(self.driver)
-        main_page.open()
-
-        search_form = main_page.search_form
-        search_form.wait_input_load()
-        search_form.set_search_field(self.search_string)
-        search_form.submit_search()
-        result_search_string = search_form.get_result_search_string()
-
-        self.assertTrue(main_page.is_domains_equal(search_form.get_current_url(), self.search_url))
-        self.assertEquals(result_search_string, self.search_string)
-
-    def test_right_ad_block_presence(self):
-        ad_xpath = '//*[@id="slot_4499"]'
-
-        main_page = Page(self.driver)
-        main_page.open()
-        self.assertTrue(main_page.is_element_present(ad_xpath))
-
-    def test_center_ad_block_presence(self):
-        ad_xpath = '//*[@id="slot_4847"]/a'
-
-        main_page = Page(self.driver)
-        main_page.open()
-        self.assertTrue(main_page.is_element_present(ad_xpath))
-
-    def test_search_bar_title(self):
-        search_page_url = 'go.mail.ru'
-        main_page = Page(self.driver)
-        main_page.open()
-        search_bar = main_page.search_bar_list
-        search_bar.click_to_element_in_internet_bar()
-        current_url = search_bar.get_current_url()
-        result = current_url.find(search_page_url)
-
-        self.assertNotEquals(result, -1)
-
-    def test_search_bar_images(self):
-        search_page_url = 'go.mail.ru'
-        main_page = Page(self.driver)
-        main_page.open()
-        search_bar = main_page.search_bar_list
-        search_bar.click_to_images_bar()
-        current_url = search_bar.get_current_url()
-        result = current_url.find(search_page_url)
-
-        self.assertNotEquals(result, -1)
-
-    def test_search_bar_video(self):
-        search_page_url = 'go.mail.ru'
-        main_page = Page(self.driver)
-        main_page.open()
-        search_bar = main_page.search_bar_list
-        search_bar.click_to_video_bar()
-        current_url = search_bar.get_current_url()
-        result = current_url.find(search_page_url)
-
-        self.assertNotEquals(result, -1)
-
-    def test_search_bar_discussion(self):
-        search_page_url = 'go.mail.ru'
-        main_page = Page(self.driver)
-        main_page.open()
-        search_bar = main_page.search_bar_list
-        search_bar.click_to_discussion_bar()
-        current_url = search_bar.get_current_url()
-        result = current_url.find(search_page_url)
-
-        self.assertNotEquals(result, -1)
-
-    def test_search_bar_answers(self):
-        search_page_url = 'otvet.mail.ru'
-        main_page = Page(self.driver)
-        main_page.open()
-        search_bar = main_page.search_bar_list
-        search_bar.click_to_answers_bar()
-        current_url = search_bar.get_current_url()
-        result = current_url.find(search_page_url)
-
-        self.assertNotEquals(result, -1)
-
-    def test_my_world_ref(self):
-        my_world_url = 'https://my.mail.ru/'
-
-        main_page = Page(self.driver)
-        main_page.open()
-
-        left_ref_form = main_page.left_ref_form
-        left_ref_form.open_my_world_ref()
-        self.assertTrue(main_page.is_domains_equal(left_ref_form.get_current_url(), my_world_url))
-
-    def test_left_form_gallery(self):
-        main_page = Page(self.driver)
-        main_page.open()
-
-        left_ref_form = main_page.left_ref_form
-        left_ref_form.wait_gallery_load()
-        self.assertTrue(left_ref_form.is_element_present(left_ref_form.MY_WORLD_GALLERY))
-
 
 class PersonalInfoTestCase(MainPageTest):
     login = "tester-mega"
@@ -346,4 +246,95 @@ class NewsBlockTest(MainPageTest):
             self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
 
 
+class OtherTest(MainPageTest):
+    def test_search(self):
+        main_page = Page(self.driver)
+        main_page.open()
 
+        search_form = main_page.search_form
+        search_form.wait_input_load()
+        search_form.set_search_field(self.search_string)
+        search_form.submit_search()
+        result_search_string = search_form.get_result_search_string()
+
+        self.assertTrue(main_page.is_domains_equal(search_form.get_current_url(), self.search_url))
+        self.assertEquals(result_search_string, self.search_string)
+
+    def test_right_ad_block_presence(self):
+        ad_xpath = '//*[@id="slot_4499"]'
+
+        main_page = Page(self.driver)
+        main_page.open()
+        self.assertTrue(main_page.is_element_present(ad_xpath))
+
+    def test_center_ad_block_presence(self):
+        ad_xpath = '//*[@id="slot_4847"]/a'
+
+        main_page = Page(self.driver)
+        main_page.open()
+        self.assertTrue(main_page.is_element_present(ad_xpath))
+
+    def test_search_bar_title(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_element_in_internet_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_images(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_images_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_video(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_video_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_discussion(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_discussion_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_answers(self):
+        search_page_url = 'otvet.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_answers_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_my_world_ref(self):
+        my_world_url = 'https://my.mail.ru/'
+
+        main_page = Page(self.driver)
+        main_page.open()
+
+        left_ref_form = main_page.left_ref_form
+        left_ref_form.open_my_world_ref()
+        self.assertTrue(main_page.is_domains_equal(left_ref_form.get_current_url(), my_world_url))
