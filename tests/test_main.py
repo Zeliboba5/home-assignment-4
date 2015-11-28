@@ -37,12 +37,8 @@ class MainPageTest(unittest.TestCase):
         search_form.submit_search()
         result_search_string = search_form.get_result_search_string()
 
-        full_search_url = search_form.get_current_url()
-        full_search_url = urlparse(full_search_url)
-        search_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_search_url)
-
+        self.assertTrue(main_page.is_domains_equal(search_form.get_current_url(), self.search_url))
         self.assertEquals(result_search_string, self.search_string)
-        self.assertEquals(search_url, self.search_url)
 
     def test_right_ad_block_presence(self):
         ad_xpath = '//*[@id="slot_4499"]'
@@ -57,6 +53,23 @@ class MainPageTest(unittest.TestCase):
         main_page = Page(self.driver)
         main_page.open()
         self.assertTrue(main_page.is_element_present(ad_xpath))
+
+    def test_my_world_ref(self):
+        my_world_url = 'https://my.mail.ru/'
+
+        main_page = Page(self.driver)
+        main_page.open()
+
+        left_ref_form = main_page.left_ref_form
+        left_ref_form.open_my_world_ref()
+        self.assertTrue(main_page.is_domains_equal(left_ref_form.get_current_url(), my_world_url))
+
+    def test_left_form_gallery(self):
+        main_page = Page(self.driver)
+        main_page.open()
+
+        left_ref_form = main_page.left_ref_form
+        self.assertTrue(left_ref_form.is_element_present(left_ref_form.MY_WORLD_GALLERY))
 
 
 class PersonalInfoTestCase(MainPageTest):
@@ -229,11 +242,7 @@ class TopBarTest(MainPageTest):
         top_bar_form = main_page.top_bar_form
 
         top_bar_form.go_to_mail_by_top_bar_ref()
-        full_mail_url = top_bar_form.get_current_url()
-        full_mail_url = urlparse(full_mail_url)
-        result_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_mail_url)
-
-        self.assertEquals(result_url, mail_url)
+        self.assertTrue(main_page.is_domains_equal(top_bar_form.get_current_url(), mail_url))
 
 
 class NewsBlockTest(MainPageTest):
