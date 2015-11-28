@@ -101,7 +101,7 @@ class AuthForm(Form):
 
     def set_login(self, login):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.visibility_of((By.XPATH, self.LOGIN_INPUT))
+            EC.visibility_of_element_located((By.XPATH, self.LOGIN_INPUT))
         )
         self.driver.find_element_by_xpath(self.LOGIN_INPUT).send_keys(login)
 
@@ -139,12 +139,12 @@ class AuthPopupForm(AuthForm):
     PRELOADER = '//*[@class="x-ph__popup__content__preloader"]'
 
     def open_login_popup(self):
-        WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_BUTTON))
+        element = WebDriverWait(self.driver, 10).until(
+            lambda driver: driver.find_element_by_xpath(self.LOGIN_BUTTON)
         )
-        self.driver.find_element_by_xpath(self.LOGIN_BUTTON).click()
+        element.click()
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.LOGIN_FORM))
+            lambda driver: driver.find_element_by_xpath(self.LOGIN_FORM)
         )
         WebDriverWait(self.driver, 10).until(
             lambda driver: EC.invisibility_of_element_located(driver.find_element_by_xpath(self.PRELOADER))
@@ -293,6 +293,9 @@ class AccountMenu(Form):
             return False
 
     def open_account_menu(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.account_menu_button))
+        )
         self.driver.find_element_by_xpath(self.account_menu_button).click()
         WebDriverWait(self.driver, 10).until(
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.account_menu))
@@ -313,7 +316,7 @@ class AccountMenu(Form):
 
     def add_second_email(self):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.account_menu_add_email))
+            EC.visibility_of_element_located((By.XPATH, self.account_menu_add_email))
         )
         self.driver.find_element_by_xpath(self.account_menu_add_email).click()
         WebDriverWait(self.driver, 10).until(
@@ -361,7 +364,7 @@ class MailboxForm(Form):
             lambda driver: EC.invisibility_of_element_located(driver.find_element_by_xpath(self.MAILBOX_PRELOADER))
         )
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.visibility_of((By.XPATH, self.ADD_EMAIL_BUTTON))
+            EC.visibility_of_element_located((By.XPATH, self.ADD_EMAIL_BUTTON))
         )
         self.driver.find_element_by_xpath(self.ADD_EMAIL_BUTTON).click()
         WebDriverWait(self.driver, 10).until(
