@@ -210,7 +210,7 @@ class TopBarTest(MainPageTest, CustomAsserts):
         self.assertDomainEqual(top_bar_form.get_current_url(), mail_url)
 
 
-class NewsBlockTest(MainPageTest):
+class NewsBlockTest(MainPageTest, CustomAsserts):
     def test_description_presence(self):
         main_page = Page(self.driver)
         main_page.open()
@@ -239,20 +239,14 @@ class NewsBlockTest(MainPageTest):
 
         blocks_number = 4
 
-        for i in range(2, blocks_number + 1):  # starts from 2 because of unique main page layout
-            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
-            news_form.click_news_block_button(i)
-            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
+        self.assertNewsChangeClass(blocks_number, news_form, chosen_block_class, not_chosen_block_class)
 
         main_page.set_full_screen_size()
         news_form.set_news_block_to_default()
 
         blocks_number = 7
 
-        for i in range(2, blocks_number + 1):
-            self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
-            news_form.click_news_block_button(i)
-            self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
+        self.assertNewsChangeClass(blocks_number, news_form, chosen_block_class, not_chosen_block_class)
 
 
 class OtherTest(MainPageTest, CustomAsserts):
