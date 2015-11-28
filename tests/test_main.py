@@ -124,6 +124,7 @@ class MainPageTest(unittest.TestCase):
         main_page.open()
 
         left_ref_form = main_page.left_ref_form
+        left_ref_form.wait_gallery_load()
         self.assertTrue(left_ref_form.is_element_present(left_ref_form.MY_WORLD_GALLERY))
 
 

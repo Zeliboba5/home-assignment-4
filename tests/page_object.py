@@ -38,7 +38,7 @@ class Page(object):
     @staticmethod
     def is_domains_equal(full_url, expected_url):
         from urlparse import urlparse
-        full_url= urlparse(full_url)
+        full_url = urlparse(full_url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=full_url)
         if domain == expected_url:
             return True
@@ -186,7 +186,7 @@ class NewsForm(Form):
         return self.driver.find_element_by_xpath(news_block_path).get_attribute("class").split()
 
     def click_news_block_button(self, span_index):
-        news_block_button = self.NEWS_BLOCKS[span_index-1]
+        news_block_button = self.NEWS_BLOCKS[span_index - 1]
         self.driver.find_element_by_xpath(news_block_button).click()
 
     def set_news_block_to_default(self):
@@ -292,6 +292,7 @@ class SearchForm(Form):
             lambda driver: driver.find_element_by_xpath(self.SEARCH_INPUT).get_attribute('value').encode('utf-8')
         )
 
+
 class SearchBarList(Form):
     SEARCH_IN_INTERNET_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__title__link" and contains(., "Поиск в интернете")]'
     IMAGES_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__projects-list__item__link" and contains(., "Картинки")]'
@@ -314,7 +315,6 @@ class SearchBarList(Form):
     def click_to_answers_bar(self):
         self.driver.find_element_by_xpath(self.ANSWERS_LINK).click()
 
-        
 
 class AccountMenu(Form):
     account_menu = '//*[@id="PH_authMenu"]'
@@ -335,7 +335,7 @@ class AccountMenu(Form):
 
     def open_account_menu(self):
         WebDriverWait(self.driver, 10).until(
-            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.account_menu_button))
+            EC.visibility_of_element_located((By.XPATH, self.account_menu_button))
         )
         self.driver.find_element_by_xpath(self.account_menu_button).click()
         WebDriverWait(self.driver, 10).until(
@@ -433,3 +433,8 @@ class LeftRefForm(Form):
             lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.MY_WORLD_REF))
         )
         self.driver.find_element_by_xpath(self.MY_WORLD_REF).click()
+
+    def wait_gallery_load(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.visibility_of_element_located((By.XPATH, self.MY_WORLD_GALLERY))
+        )
