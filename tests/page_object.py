@@ -150,7 +150,7 @@ class AuthForm(Form):
 class AuthPopupForm(AuthForm):
     LOGIN_INPUT = '//*[@id="ph_login"]'
     PASSWORD_INPUT = '//*[@id="ph_password"]'
-    SUBMIT_BUTTON = '//*[@id="x-ph__authForm__popup"]/div[3]/div/div[1]/span/span/input'
+    SUBMIT_BUTTON = '//*[@class="x-ph__button__input"]'
     LOGIN_BUTTON = '//*[@id="PH_authLink"]'
     LOGIN_POPUP = '//*[@id="x-ph__authForm__popup"]'
     LOGIN_FORM = '//*[@id="x-ph__authForm"]/div'
