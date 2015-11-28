@@ -318,7 +318,6 @@ class NewsBlockTest(MainPageTest):
         self.assertTrue(news_form.is_description_related_to_news())
 
     def test_news_blocks(self):
-        mail_url = 'https://e.mail.ru/'
         not_chosen_block_class = 'news__list '.split()
         chosen_block_class = 'news__list  news__list_active'.split()
 
@@ -344,15 +343,6 @@ class NewsBlockTest(MainPageTest):
             self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
             news_form.click_news_block_button(i)
             self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
-
-        top_bar_form = main_page.top_bar_form
-
-        top_bar_form.go_to_mail_by_top_bar_ref()
-        full_mail_url = top_bar_form.get_current_url()
-        full_mail_url = urlparse(full_mail_url)
-        result_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_mail_url)
-
-        self.assertEquals(result_url, mail_url)
 
 
 
