@@ -161,7 +161,6 @@ class PersonalInfoTestCase(MainPageTest):
 class TopBarTest(MainPageTest, CustomAsserts):
     def test_top_bar_dropdown(self):
         popup_closed_classes = 'x-ph__menu'.split()
-        popup_opened_classes_full_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_left'.split()
         popup_opened_classes_small_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_right'.split()
         main_page = Page(self.driver)
         main_page.open()
@@ -175,6 +174,14 @@ class TopBarTest(MainPageTest, CustomAsserts):
         self.assertEquals(top_bar_form.get_popup_classes(), popup_opened_classes_small_size)
         top_bar_form.trigger_popup()
         self.assertEquals(top_bar_form.get_popup_classes(), popup_closed_classes)
+
+    def test_top_bar_dropdown_full_size(self):
+        popup_closed_classes = 'x-ph__menu'.split()
+        popup_opened_classes_full_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_left'.split()
+        main_page = Page(self.driver)
+        main_page.open()
+
+        top_bar_form = main_page.top_bar_form
 
         main_page.set_full_screen_size()
 
