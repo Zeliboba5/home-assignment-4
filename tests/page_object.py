@@ -35,6 +35,16 @@ class Page(object):
         else:
             return False
 
+    @staticmethod
+    def is_domains_equal(full_url, expected_url):
+        from urlparse import urlparse
+        full_url= urlparse(full_url)
+        domain = '{uri.scheme}://{uri.netloc}/'.format(uri=full_url)
+        if domain == expected_url:
+            return True
+        else:
+            return False
+
     @property
     def auth_form(self):
         return AuthForm(self.driver)
@@ -70,6 +80,10 @@ class Page(object):
     @property
     def mailbox_form(self):
         return MailboxForm(self.driver)
+
+    @property
+    def left_ref_form(self):
+        return LeftRefForm(self.driver)
 
 
 class Form(object):
@@ -408,3 +422,14 @@ class MailboxForm(Form):
             return True
         else:
             return False
+
+
+class LeftRefForm(Form):
+    MY_WORLD_REF = '//*[@name="clb1753672"]'
+    MY_WORLD_GALLERY = '//*[@class="gallery__list"]'
+
+    def open_my_world_ref(self):
+        WebDriverWait(self.driver, 10).until(
+            lambda driver: EC.element_to_be_clickable(driver.find_element_by_xpath(self.MY_WORLD_REF))
+        )
+        self.driver.find_element_by_xpath(self.MY_WORLD_REF).click()
