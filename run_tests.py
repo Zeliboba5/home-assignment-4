@@ -6,7 +6,7 @@ if __name__ == '__main__':
     suite = unittest.TestSuite((
         unittest.makeSuite(OtherTest),
         unittest.makeSuite(TopBarTest),
-        unittest.makeSuite(PersonalInfoTestCase)
+        unittest.makeSuite(PersonalInfoTestCase),
         unittest.makeSuite(NewsBlockTest)
     ))
     result = unittest.TextTestRunner().run(suite)
