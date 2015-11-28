@@ -52,6 +52,10 @@ class Page(object):
         return SearchForm(self.driver)
 
     @property
+    def search_bar_list(self):
+        return SearchBarList(self.driver)
+
+    @property
     def auth_popup_form(self):
         return AuthPopupForm(self.driver)
 
@@ -274,6 +278,29 @@ class SearchForm(Form):
             lambda driver: driver.find_element_by_xpath(self.SEARCH_INPUT).get_attribute('value').encode('utf-8')
         )
 
+class SearchBarList(Form):
+    SEARCH_IN_INTERNET_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__title__link" and contains(., "Поиск в интернете")]'
+    IMAGES_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__projects-list__item__link" and contains(., "Картинки")]'
+    VIDEO_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__projects-list__item__link" and contains(., "Видео")]'
+    DISCUSSION_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__projects-list__item__link" and contains(., "Обсуждения")]'
+    ANSWERS_LINK = '//*[@class="search__projects-list"]/*/*[@class="search__projects-list__item__link" and contains(., "Ответы")]'
+
+    def click_to_element_in_internet_bar(self):
+        self.driver.find_element_by_xpath(self.SEARCH_IN_INTERNET_LINK).click()
+
+    def click_to_images_bar(self):
+        self.driver.find_element_by_xpath(self.IMAGES_LINK).click()
+
+    def click_to_video_bar(self):
+        self.driver.find_element_by_xpath(self.VIDEO_LINK).click()
+
+    def click_to_discussion_bar(self):
+        self.driver.find_element_by_xpath(self.DISCUSSION_LINK).click()
+
+    def click_to_answers_bar(self):
+        self.driver.find_element_by_xpath(self.ANSWERS_LINK).click()
+
+        
 
 class AccountMenu(Form):
     account_menu = '//*[@id="PH_authMenu"]'

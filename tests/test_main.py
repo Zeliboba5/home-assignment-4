@@ -58,6 +58,61 @@ class MainPageTest(unittest.TestCase):
         main_page.open()
         self.assertTrue(main_page.is_element_present(ad_xpath))
 
+    def test_search_bar_title(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_element_in_internet_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_images(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_images_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_video(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_video_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_discussion(self):
+        search_page_url = 'go.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_discussion_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
+    def test_search_bar_answers(self):
+        search_page_url = 'otvet.mail.ru'
+        main_page = Page(self.driver)
+        main_page.open()
+        search_bar = main_page.search_bar_list
+        search_bar.click_to_answers_bar()
+        current_url = search_bar.get_current_url()
+        result = current_url.find(search_page_url)
+
+        self.assertNotEquals(result, -1)
+
 
 class PersonalInfoTestCase(MainPageTest):
     login = "tester-mega"
@@ -254,6 +309,7 @@ class NewsBlockTest(MainPageTest):
         self.assertTrue(news_form.is_description_related_to_news())
 
     def test_news_blocks(self):
+        mail_url = 'https://e.mail.ru/'
         not_chosen_block_class = 'news__list '.split()
         chosen_block_class = 'news__list  news__list_active'.split()
 
@@ -279,3 +335,15 @@ class NewsBlockTest(MainPageTest):
             self.assertEquals(news_form.get_news_block_classes(i), chosen_block_class)
             news_form.click_news_block_button(i)
             self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
+
+        top_bar_form = main_page.top_bar_form
+
+        top_bar_form.go_to_mail_by_top_bar_ref()
+        full_mail_url = top_bar_form.get_current_url()
+        full_mail_url = urlparse(full_mail_url)
+        result_url = '{uri.scheme}://{uri.netloc}/'.format(uri=full_mail_url)
+
+        self.assertEquals(result_url, mail_url)
+
+
+
