@@ -3,6 +3,8 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import unittest
 from urlparse import urlparse
 from page_object import Page
+from custom_asserts import CustomAsserts
+
 import os
 
 
@@ -156,7 +158,7 @@ class PersonalInfoTestCase(MainPageTest):
         self.assertTrue(mailbox_form.is_both_emails_present())
 
 
-class TopBarTest(MainPageTest):
+class TopBarTest(MainPageTest, CustomAsserts):
     def test_top_bar_dropdown(self):
         popup_closed_classes = 'x-ph__menu'.split()
         popup_opened_classes_full_size = 'x-ph__menu x-ph__menu_open x-ph__menu_open_left'.split()
@@ -198,7 +200,7 @@ class TopBarTest(MainPageTest):
         top_bar_form = main_page.top_bar_form
 
         top_bar_form.go_to_mail_by_top_bar_ref()
-        self.assertTrue(main_page.is_domains_equal(top_bar_form.get_current_url(), mail_url))
+        self.assertDomainEqual(top_bar_form.get_current_url(), mail_url)
 
 
 class NewsBlockTest(MainPageTest):
@@ -246,7 +248,7 @@ class NewsBlockTest(MainPageTest):
             self.assertEquals(news_form.get_news_block_classes(i), not_chosen_block_class)
 
 
-class OtherTest(MainPageTest):
+class OtherTest(MainPageTest, CustomAsserts):
     def test_search(self):
         main_page = Page(self.driver)
         main_page.open()
@@ -257,7 +259,7 @@ class OtherTest(MainPageTest):
         search_form.submit_search()
         result_search_string = search_form.get_result_search_string()
 
-        self.assertTrue(main_page.is_domains_equal(search_form.get_current_url(), self.search_url))
+        self.assertDomainEqual(search_form.get_current_url(), self.search_url)
         self.assertEquals(result_search_string, self.search_string)
 
     def test_right_ad_block_presence(self):
@@ -337,4 +339,4 @@ class OtherTest(MainPageTest):
 
         left_ref_form = main_page.left_ref_form
         left_ref_form.open_my_world_ref()
-        self.assertTrue(main_page.is_domains_equal(left_ref_form.get_current_url(), my_world_url))
+        self.assertDomainEqual(left_ref_form.get_current_url(), my_world_url)

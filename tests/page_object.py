@@ -3,7 +3,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 
-
 class Page(object):
     BASE_URL = "http://mail.ru"
 
@@ -31,16 +30,6 @@ class Page(object):
         )
 
         if element.is_displayed():
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def is_domains_equal(full_url, expected_url):
-        from urlparse import urlparse
-        full_url = urlparse(full_url)
-        domain = '{uri.scheme}://{uri.netloc}/'.format(uri=full_url)
-        if domain == expected_url:
             return True
         else:
             return False
